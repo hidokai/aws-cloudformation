@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Developer Group and Users"
+
+
+Resources:
+  DeveloperGroup: #Create group for Developers
+    Type: "AWS::IAM::Group"
+    Properties:
+      GroupName: "Developer"
+  EC2LimitedAccess:
+    Type: "AWS::IAM::ManagedPolicy"
+    Properties:
+      ManagedPolicyName: "EC2LimitedAccess"
+      PolicyDocument:
+        Version: "2012-10-17"
+    Statement:
+     - Effect: "Allow"
+       Action:
+        - "ec2:RunInstances"
+       Resource: "*"
+       Condition:
+        StringEquals:
+         ec2:InstanceType:
+          - "t2.small"
+          - "t2.medium"
+     - Effect: "Allow"
+       Action:
+        - "iam:*AccessKey"
+        - "iam:ChangePassword"
+       Resource:
+        Fn::Join: [":",["arn:aws:iam:", !Ref "AWS::AccountId", "user/${aws:username}"]]
+    Group:
+        - Developers
